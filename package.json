@@ -1,0 +1,11 @@
+{
+  "name": "takomo-examples",
+  "version": "1.0.0",
+  "description": "Examples for Takomo",
+  "scripts": {},
+  "author": "henri@takomo.io",
+  "license": "MIT",
+  "dependencies": {
+    "takomo": "0.0.2"
+  }
+}

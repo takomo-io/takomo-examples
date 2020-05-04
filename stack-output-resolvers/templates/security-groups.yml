@@ -1,0 +1,10 @@
+Description: Takomo Examples - Stack Ouput Resolvers - Security Groups
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC id
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group

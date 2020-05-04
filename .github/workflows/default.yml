@@ -1,0 +1,33 @@
+name: Default
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.EXAMPLES_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.EXAMPLES_AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1.1.0
+        with:
+          version: 13.2.0
+      - uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+      - run: npm install
+      - run: npx tkm --version
+      - name: Custom resolvers launch
+        run: npx tkm stacks deploy -d custom-resolvers -y
+      - name: Custom resolvers delete
+        run: npx tkm stacks undeploy -d custom-resolvers -y
+      - name: Stack output resolvers launch
+        run: npx tkm stacks deploy -d stack-output-resolvers -y
+      - name: Stack output resolvers delete
+        run: npx tkm stacks undeploy -d stack-output-resolvers -y

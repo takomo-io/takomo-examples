@@ -1,0 +1,13 @@
+Description: Takomo Examples - Custom Resolvers
+Parameters:
+  Timestamp:
+    Type: Number
+    Description: Timestamp
+  Name:
+    Type: String
+    Description: Name for the log group
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${Name}-${Timestamp}

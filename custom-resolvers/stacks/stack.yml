@@ -1,0 +1,8 @@
+project: takomo-examples
+regions: eu-central-1
+parameters:
+  Timestamp:
+    resolver: timestamp
+  Name:
+    resolver: uppercase
+    name: MyLogGroup
