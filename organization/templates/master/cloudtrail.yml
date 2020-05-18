@@ -1,0 +1,171 @@
+Description: CloudTrail
+Parameters:
+
+  BucketName:
+    Type: String
+    Description: Name for CloudTrail bucket
+
+Resources:
+
+  CloudTrailBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CloudTrailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CloudTrailBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Sid: AWSCloudTrailAclCheck
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Action: s3:GetBucketAcl
+          Resource: !GetAtt CloudTrailBucket.Arn
+        - Sid: AWSCloudTrailWrite
+          Effect: Allow
+          Principal:
+            Service: cloudtrail.amazonaws.com
+          Action: s3:PutObject
+          Resource: !Sub ${CloudTrailBucket.Arn}/*
+          Condition:
+            StringEquals:
+              "s3:x-amz-acl": bucket-owner-full-control
+
+  CloudTrailLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: org-cloud-trail
+      RetentionInDays: 30
+
+  CloudTrailLogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: Logs
+          PolicyDocument:
+            Statement:
+              - Sid: CloudTrailLogStream
+                Effect: Allow
+                Action:
+                  # - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*" 
+
+  CloudTrail:
+    Type: AWS::CloudTrail::Trail
+    DependsOn: CloudTrailBucketPolicy
+    Properties:
+      TrailName: Organization
+      IsLogging: true
+      IsMultiRegionTrail: true
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      S3BucketName: !Ref CloudTrailBucket
+      CloudWatchLogsLogGroupArn: !GetAtt CloudTrailLogGroup.Arn
+      CloudWatchLogsRoleArn: !GetAtt CloudTrailLogRole.Arn
+
+  CloudTrailModifierRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole     
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole       
+      Policies:
+        - PolicyName: Lambda
+          PolicyDocument:
+            Statement:
+              - Sid: Read
+                Effect: Allow
+                Action:
+                  - cloudtrail:GetTrail
+                  - iam:GetRole
+                  - organizations:DescribeOrganization
+                  - organizations:ListAWSServiceAccessForOrganization
+                Resource: "*"
+              - Sid: UpdateTrail
+                Effect: Allow
+                Action: cloudtrail:UpdateTrail
+                Resource: !GetAtt CloudTrail.Arn
+              - Sid: UpdateIAM
+                Effect: Allow
+                Action: iam:CreateServiceLinkedRole
+                Resource: "*"  
+              # - Sid: PassIamRole
+              #   Effect: Allow
+              #   Action: iam:PassRole
+              #   Resource: !GetAtt CloudTrailLogRole.Arn
+
+  CloudTrailModifier:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudTrailModifier
+      Description: Update CloudTrail to be an organization trail
+      Handler: index.handler
+      Role: !GetAtt CloudTrailModifierRole.Arn
+      Runtime: python3.6
+      Timeout: 120
+      Code: 
+        ZipFile: |
+          import json
+          import cfnresponse as c
+          import boto3
+
+          ct = boto3.client("cloudtrail") 
+
+          def handler(event, context):
+            try:
+              print("Received event: " + json.dumps(event, indent=2))
+              props = event["ResourceProperties"]
+
+              if event["RequestType"] == "Delete":
+                print("Delete requested, no actions needed")
+                c.send(event, context, c.SUCCESS, {})
+                return
+              
+              name = props["TrailName"]
+              resp = ct.get_trail(Name = name)
+              trail = resp["Trail"]
+              print("CloudTrail information: " + json.dumps(trail, indent=2))
+
+              if trail["IsOrganizationTrail"]:
+                print("CloudTrail is already organization trail")   
+                c.send(event, context, c.SUCCESS, {})
+                return
+
+              ct.update_trail(Name = name, IsOrganizationTrail = True)
+              print("CloudTrail updated as organization trail")
+
+              c.send(event, context, c.SUCCESS, {})
+
+            except Exception as e:
+              print("An error occurred: {}".format(e))
+              c.send(event, context, c.FAILED, {})
+
+  ModifyCloudTrail:
+    Type: AWS::CloudFormation::CustomResource
+    Version: 1.0
+    Properties:
+      ServiceToken: !GetAtt CloudTrailModifier.Arn
+      TrailName: !Ref CloudTrail
+    

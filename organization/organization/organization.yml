@@ -1,0 +1,48 @@
+masterAccountId: "{{ env.MASTER_ACCOUNT_ID }}"
+
+serviceControlPolicies:
+  FullAWSAccess:
+    description: AWS managed default policy
+    awsManaged: true
+  AllowedRegions:
+    description: Set allowed regions
+
+vars:
+  cloudTrailBucketName: {{ env.MASTER_ACCOUNT_CLOUD_TRAIL_BUCKET_NAME }}
+  budgets:
+    totalCostLimit: 10
+    notificationEmail: {{ env.BUDGETS_NOTIFICATION_EMAIL }}
+   
+organizationalUnits:
+  
+  Root:
+    serviceControlPolicies:
+      - FullAWSAccess
+      - AllowedRegions
+  
+  Root/Master:
+    accounts:
+      - "{{ env.MASTER_ACCOUNT_ID }}"
+    vars:
+      budgets:
+        totalCostLimit: 50
+    configSets:
+      - masterAccount  
+  
+  Root/Examples:
+    accounts:
+      - "{{ env.ACCOUNT_1 }}"   
+      - "{{ env.ACCOUNT_2 }}"   
+      - "{{ env.ACCOUNT_3 }}"
+    configSets:
+      - examples
+
+configSets:
+
+  masterAccount:
+    commandPaths:
+      - /master
+
+  examples:
+    commandPaths:
+      - /examples    
