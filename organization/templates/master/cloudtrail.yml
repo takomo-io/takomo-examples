@@ -62,7 +62,6 @@ Resources:
               - Sid: CloudTrailLogStream
                 Effect: Allow
                 Action:
-                  # - logs:DescribeLogGroups
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: "*" 
@@ -111,10 +110,6 @@ Resources:
                 Effect: Allow
                 Action: iam:CreateServiceLinkedRole
                 Resource: "*"  
-              # - Sid: PassIamRole
-              #   Effect: Allow
-              #   Action: iam:PassRole
-              #   Resource: !GetAtt CloudTrailLogRole.Arn
 
   CloudTrailModifier:
     Type: AWS::Lambda::Function
