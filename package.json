@@ -6,6 +6,6 @@
   "author": "henri@takomo.io",
   "license": "MIT",
   "dependencies": {
-    "takomo": "2.7.0"
+    "takomo": "2.7.1"
   }
 }

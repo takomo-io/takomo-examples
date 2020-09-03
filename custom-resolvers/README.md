@@ -1,3 +1,3 @@
-# Custom Resolvers Example
+# Custom Resolvers
 
-This example demonstrates how to implement custom resolvers.
+This directory contains examples that demonstrate how to implement and use custom resolvers.

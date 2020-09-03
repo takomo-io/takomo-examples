@@ -1,0 +1,5 @@
+name: resolvers-with-dependencies-b
+parameters:
+  LogGroupName:
+    resolver: stack-creation-time
+    otherStack: /stack-a.yml

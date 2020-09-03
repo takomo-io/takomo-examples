@@ -3,9 +3,9 @@ module.exports = {
   init: (props) => {
     console.log("Initialize resolver: uppercase");
     return {
-      isConfidential: () => true,
-      getDependencies: () => [],
-      getIamRoleArns: () => [],
+      confidential: () => true,
+      dependencies: () => [],
+      iamRoleArns: () => [],
       resolve: (input) => {
         input.logger.debug("Execute uppercase!");
         input.logger.debug(`Resolver value for parameter '${input.parameterName}'`);

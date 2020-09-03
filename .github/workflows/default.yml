@@ -23,11 +23,15 @@ jobs:
           key: npm-${{ hashFiles('package-lock.json') }}
       - run: npm install
       - run: npx tkm --version
-      - name: Custom resolvers launch
-        run: npx tkm stacks deploy -d custom-resolvers -y
-      - name: Custom resolvers delete
-        run: npx tkm stacks undeploy -d custom-resolvers -y
-      - name: Stack output resolvers launch
+      - name: Custom resolvers - simple - deploy
+        run: npx tkm stacks deploy -d custom-resolvers/simple -y
+      - name: Custom resolvers - simple - undeploy
+        run: npx tkm stacks undeploy -d custom-resolvers/simple -y
+      - name: Custom resolvers - stack-dependencies - deploy
+        run: npx tkm stacks deploy -d custom-resolvers/stack-dependencies -y
+      - name: Custom resolvers - stack-dependencies - undeploy
+        run: npx tkm stacks undeploy -d custom-resolvers/stack-dependencies -y
+      - name: Stack output resolvers deploy
         run: npx tkm stacks deploy -d stack-output-resolvers -y
-      - name: Stack output resolvers delete
+      - name: Stack output resolvers undeploy
         run: npx tkm stacks undeploy -d stack-output-resolvers -y

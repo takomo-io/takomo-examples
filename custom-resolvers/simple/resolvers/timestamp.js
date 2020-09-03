@@ -3,9 +3,9 @@ module.exports = {
   init: (props) => {
     console.log("Initialize resolver: timestamp");
     return {
-      isConfidential: () => false,
-      getDependencies: () => [],
-      getIamRoleArns: () => [],
+      confidential: () => false,
+      dependencies: () => [],
+      iamRoleArns: () => [],
       resolve: (input) => {
         input.logger.debug("Execute timestamp!");
         input.logger.debug(`Resolver value for parameter '${input.parameterName}'`);
