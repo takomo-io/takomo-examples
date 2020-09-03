@@ -1,0 +1,11 @@
+template: stack-02.yml
+accountIds: "{{ env.ACCOUNT_2_ID }}"
+commandRole: {{ env.ACCOUNT_2_ROLE }}
+parameters:
+  LogGroupName:
+    resolver: output-reader
+    role: {{ env.ACCOUNT_1_ROLE }}
+    stackName: takomo-examples-iam-roles-example-stack-01
+    outputName: LogGroupName
+    region: eu-central-1
+depends: /iam-roles-example/stack-01.yml

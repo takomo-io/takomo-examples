@@ -31,6 +31,22 @@ jobs:
         run: npx tkm stacks deploy -d custom-resolvers/stack-dependencies -y
       - name: Custom resolvers - stack-dependencies - undeploy
         run: npx tkm stacks undeploy -d custom-resolvers/stack-dependencies -y
+
+      - name: Custom resolvers - iam-roles - deploy
+        run: npx tkm stacks deploy -d custom-resolvers/iam-roles -y
+        env:
+          ACCOUNT_1_ID: ${{ secrets.ACCOUNT_1_ID }}
+          ACCOUNT_1_ROLE: ${{ secrets.ACCOUNT_1_ROLE }}
+          ACCOUNT_2_ID: ${{ secrets.ACCOUNT_2_ID }}
+          ACCOUNT_2_ROLE: ${{ secrets.ACCOUNT_2_ROLE }}
+      - name: Custom resolvers - iam-roles - undeploy
+        run: npx tkm stacks undeploy -d custom-resolvers/iam-roles -y
+        env:
+          ACCOUNT_1_ID: ${{ secrets.ACCOUNT_1_ID }}
+          ACCOUNT_1_ROLE: ${{ secrets.ACCOUNT_1_ROLE }}
+          ACCOUNT_2_ID: ${{ secrets.ACCOUNT_2_ID }}
+          ACCOUNT_2_ROLE: ${{ secrets.ACCOUNT_2_ROLE }}
+
       - name: Stack output resolvers deploy
         run: npx tkm stacks deploy -d stack-output-resolvers -y
       - name: Stack output resolvers undeploy

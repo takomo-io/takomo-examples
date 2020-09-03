@@ -25,7 +25,7 @@ module.exports = {
         const client = await stack.getCloudFormationClient().getAwsClient()
         const { Stacks } = await client.describeStacks({ StackName: stack.getName() }).promise()
         if (Stacks.length !== 1) {
-          throw new Error("Expected exactly one matching stacks but got " + (rest.length + 1))
+          throw new Error("Expected exactly one matching stacks but got " + Stacks.length)
         }
 
         const creationTime = Stacks[0].CreationTime

@@ -1,0 +1,3 @@
+template: stack-01.yml
+accountIds: "{{ env.ACCOUNT_1_ID }}"
+commandRole: {{ env.ACCOUNT_1_ROLE }}
