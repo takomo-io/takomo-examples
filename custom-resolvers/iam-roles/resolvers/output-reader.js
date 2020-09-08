@@ -16,6 +16,7 @@ module.exports = {
           outputName: joi.string().required(),
         })
       },
+      iamRoleArns: [props.role],
       resolve: async (input) => {
         input.logger.debug("Execute resolver: output-reader");
 
