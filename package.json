@@ -7,6 +7,6 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "2.745.0",
-    "takomo": "2.7.1"
+    "takomo": "3.0.0"
   }
 }

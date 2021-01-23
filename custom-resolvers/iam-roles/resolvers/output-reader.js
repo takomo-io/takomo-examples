@@ -8,8 +8,8 @@ module.exports = {
   init: (props) => {
     console.log("Initialize resolver: output-reader");
     return {
-      schema: (joi, schema) => {
-        return schema.keys({
+      schema: ({joi, base}) => {
+        return base.keys({
           stackName: joi.string().required(),
           role: joi.string().required(),
           region: joi.string().required(),
@@ -20,7 +20,7 @@ module.exports = {
       resolve: async (input) => {
         input.logger.debug("Execute resolver: output-reader");
 
-        const cp = await input.ctx.getCredentialProvider().createCredentialProviderForRole(props.role)
+        const cp = await input.ctx.credentialManager.createCredentialManagerForRole(props.role)
 
         const cf = new AWS.CloudFormation({
           region: props.region,

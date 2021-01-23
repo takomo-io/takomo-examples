@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      - feature/*
+      - release/*
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.EXAMPLES_AWS_ACCESS_KEY_ID }}

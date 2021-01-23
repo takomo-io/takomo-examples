@@ -7,8 +7,8 @@ module.exports = {
     console.log("Initialize resolver: stack-creation-time");
     return {
       dependencies: [props.otherStack],
-      schema: (joi, schema) => {
-        return schema.keys({
+      schema: ({joi, base}) => {
+        return base.keys({
           otherStack: joi.string().required()
         })
       },
@@ -16,14 +16,14 @@ module.exports = {
         input.logger.debug("Execute resolver: stack-creation-time");
 
         const stacks = input.ctx.getStacksByPath(props.otherStack)
-        if (stacks.length > 1) {
-          throw new Error("Expected exactly one matching stacks but got " + (rest.length + 1))
+        if (stacks.length !== 1) {
+          throw new Error("Expected exactly one matching stacks but got " + (stacks.length + 1))
         }
 
         const [ stack ] = stacks
 
-        const client = await stack.getCloudFormationClient().getAwsClient()
-        const { Stacks } = await client.describeStacks({ StackName: stack.getName() }).promise()
+        const client = await stack.getCloudFormationClient().getNativeClient()
+        const { Stacks } = await client.describeStacks({ StackName: stack.name }).promise()
         if (Stacks.length !== 1) {
           throw new Error("Expected exactly one matching stacks but got " + Stacks.length)
         }
